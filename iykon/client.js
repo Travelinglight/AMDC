@@ -1,26 +1,13 @@
 //var http = require('http');
 var net = require('net');
+var send=1;
+var login = "user bg5zzz pass 24229 "
 
 var options = {
-  host: 'hangzhou.aprs2.net',
+  host: 'rotate.aprs2.net',
   port: 14580,
   //path:'/'
 }
-/*
-var request = http.get(options,function(res){
-  var rec="";
-  res.on('data',function(block){
-    rec += block;
-  });
-  res.on('end',function(){
-    console.log(rec);
-  });
-  //console.log(res);
-  console.log('Connected.');
-}).on('error',function(error){
-  console.log('Error: '+error.message);
-})
-*/
 
 var client = net.connect(options,function(){
   console.log('Client connected.');
@@ -29,12 +16,35 @@ var client = net.connect(options,function(){
 })
 
 client.on('data',function(data){
+  var i=0;
   var rec = data.toString();
-  console.log(rec);
+  while(rec[i]!=':' && i<rec.length)
+    ++i;
+  //console.log(rec);
+  /*if(send == 1)
+    console.log('received.'+send+':'+rec[i+1]);*/
+  if(rec[i+1]=='0' && (rec[i+2]=='x' || rec[i+2]=='X') && rec[i+3]=='1' && send == 1)
+    console.log('This is a message:\n'+rec);
+  if(rec[i+1]=='`' && send == 1)
+    console.log(rec);
 })
 
 process.stdin.on('data',function(data){
-  client.write(data.toString());
+  var str;
+  str = data.toString();
+  if(str[0] == '-'){
+    str = str.substr(1,str.length-1);
+    client.write(login+str);
+  }
+  else if(str == 'p\r\n'){
+    send = 0;
+  }
+  else if(str=='s\r\n'){
+    send = 1;
+  }
+  else{
+    client.write(str);
+  }
 })
 
 /*
