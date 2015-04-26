@@ -2,7 +2,7 @@ function decode(rec){
   var mic = rec.substr(rec.search(">") + 1, 6);
   if (mic.length != 6)
     return;
-  var regexp = /^[0-9A-Z]+$/;
+  var regexp = /^[0-9A-LP-Z]+$/;
   if(!regexp.test(mic))
     return;
 
@@ -86,7 +86,6 @@ function decode(rec){
     i++;
 
   //to decode the longitute degrees
-  console.log(i);
   var LongD = rec[i+1].charCodeAt()-28;
   if(Info.LongOff == 100)
     LongD += 100;
@@ -131,8 +130,9 @@ function decode(rec){
   var alti3 = rec[i-1].charCodeAt()-33;
   var alti2 = rec[i-2].charCodeAt()-33;
   var alti1 = rec[i-3].charCodeAt()-33;
-  altitude = alti1 + alti2*91 + alti3*91*91 - 1000;
+  altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
   Info["altitude"] = altitude;
-  console.log(JSON.stringify(Info));
+  return Info;
+  //console.log(JSON.stringify(Info));
 }
 exports.decode = decode;

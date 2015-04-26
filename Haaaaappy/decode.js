@@ -1,5 +1,11 @@
 function decode(rec){
   var mic = rec.substr(rec.search(">") + 1, 6);
+  if (mic.length != 6)
+    return;
+  var regexp = /^[0-9A-LP-Z]+$/;
+  if(!regexp.test(mic))
+    return;
+
   var map = {};
   map["0"] = {"LatDigit" : 0, "Msg" : "0", "NS" : "South", "LongOff" : 0, "WE" : "East"};
   map["1"] = {"LatDigit" : 1, "Msg" : "0", "NS" : "South", "LongOff" : 0, "WE" : "East"};
@@ -76,7 +82,7 @@ function decode(rec){
 
   //to find where the Infomation field starts
   var i = 0;
-  while(rec[i]!='`' && i<rec.length)
+  while((rec[i]!='`') && (rec[i] != '\'') && (i<rec.length))
     i++;
 
   //to decode the longitute degrees
@@ -124,8 +130,9 @@ function decode(rec){
   var alti3 = rec[i-1].charCodeAt()-33;
   var alti2 = rec[i-2].charCodeAt()-33;
   var alti1 = rec[i-3].charCodeAt()-33;
-  altitude = alti1 + alti2*91 + alti3*91*91 - 1000;
+  altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
   Info["altitude"] = altitude;
-
+  return Info;
+  //console.log(JSON.stringify(Info));
 }
 exports.decode = decode;

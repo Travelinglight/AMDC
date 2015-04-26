@@ -5,7 +5,7 @@ var postData = {};
 postData.msg = "iykon is a good guy";
 postData = JSON.stringify(postData);
 
-var options = {
+var postOptions = {
   hostname : 'localhost',
   port : 2333,
   path : '/haha',
