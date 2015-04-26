@@ -45,13 +45,13 @@ function decode(rec){
   MicMsg[6] = {"S" : "M1: En Route", "C" : "C1: Custom-1"};
   MicMsg[7] = {"S" : "M0: Off Duty", "C" : "C0: Custom-0"};
 
-  var destInfo = {};
-  destInfo.LatiD = parseInt(map[mic[0]].LatDigit + map[mic[1]].LatDigit);
-  destInfo.LatiM = parseInt(map[mic[2]].LatDigit + map[mic[3]].LatDigit);
-  destInfo.LatiH = parseInt(map[mic[4]].LatDigit + map[mic[5]].LatDigit);
-  destInfo.NS = map[mic[3]].NS;
-  destInfo.WE = map[mic[5]].WE;
-  destInfo.LongOff = map[mic[4]].LongOff;
+  var Info = {};
+  Info.LatiD = parseInt(map[mic[0]].LatDigit + map[mic[1]].LatDigit);
+  Info.LatiM = parseInt(map[mic[2]].LatDigit + map[mic[3]].LatDigit);
+  Info.LatiH = parseInt(map[mic[4]].LatDigit + map[mic[5]].LatDigit);
+  Info.NS = map[mic[3]].NS;
+  Info.WE = map[mic[5]].WE;
+  Info.LongOff = map[mic[4]].LongOff;
 
   // mic-e message
   var msgIdx = parseInt(map[mic[0]].Msg[0]) * 4 + parseInt(map[mic[1]].Msg[0]) * 2 + parseInt(map[mic[2]].Msg[0]);
@@ -68,16 +68,13 @@ function decode(rec){
 
   // assign message
   if (msgTyp == "E")
-    destInfo.Msg = MicMst[0];
+    Info.Msg = MicMst[0];
   else if (msgTyp == "S")
-    destInfo.Msg = MicMst[msgIdx].S;
+    Info.Msg = MicMst[msgIdx].S;
   else if (msgTyp == "C")
-    destInfo.Msg = MicMst[msgIdx].C;
+    Info.Msg = MicMst[msgIdx].C;
 
-  //Information field
-  var infor = {};
-
-  //to find where the information field starts
+  //to find where the Infomation field starts
   var i = 0;
   while(rec[i]!='`' && i<rec.length)
     i++;
@@ -90,17 +87,17 @@ function decode(rec){
     LongD -= 80;
   if(LongD>=190 && LongD<=199)
     LongD -= 190;
-  infor["LongD"] = LongD;
+  Info["LongD"] = LongD;
 
   //to decode the longitute minutes
   var LongM = rec[i+2].charCodeAt()-28;
   if(LongM>=60)
     LongM -= 60;
-  infor["LongM"] = LongM;
+  Info["LongM"] = LongM;
 
   //to decode the longitute hundredths
   var LongH = rec[i+3].charCodeAt()-28;
-  infor["LongH"] = LongH;
+  Info["LongH"] = LongH;
 
   //to decode the speed and course
   var SP = rec[i+4].charCodeAt()-28;
@@ -114,8 +111,8 @@ function decode(rec){
     speed -= 800;
   if(course>=400)
     course -= 400;
-  infor["speed"] = speed;
-  infor["course"] = course;
+  Info["speed"] = speed;
+  Info["course"] = course;
 
   //to find where the status text ends
   var i = 0;
@@ -128,7 +125,7 @@ function decode(rec){
   var alti2 = rec[i-2].charCodeAt()-33;
   var alti1 = rec[i-3].charCodeAt()-33;
   altitude = alti1 + alti2*91 + alti3*91*91 - 1000;
-  infor["altitude"] = altitude;
+  Info["altitude"] = altitude;
 
 }
 module.exports = decode;
