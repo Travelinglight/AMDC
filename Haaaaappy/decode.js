@@ -68,11 +68,11 @@ function decode(rec){
 
   // assign message
   if (msgTyp == "E")
-    Info.Msg = MicMst[0];
+    Info.Msg = MicMsg[0];
   else if (msgTyp == "S")
-    Info.Msg = MicMst[msgIdx].S;
+    Info.Msg = MicMsg[msgIdx].S;
   else if (msgTyp == "C")
-    Info.Msg = MicMst[msgIdx].C;
+    Info.Msg = MicMsg[msgIdx].C;
 
   //to find where the Infomation field starts
   var i = 0;
@@ -81,7 +81,7 @@ function decode(rec){
 
   //to decode the longitute degrees
   var LongD = rec[i+1].charCodeAt()-28;
-  if(LongOff == 100)
+  if(Info.LongOff == 100)
     LongD += 100;
   if(LongD>=180 && LongD<=189)
     LongD -= 80;
@@ -128,4 +128,4 @@ function decode(rec){
   Info["altitude"] = altitude;
 
 }
-module.exports = decode;
+exports.decode = decode;
