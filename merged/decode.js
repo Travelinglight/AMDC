@@ -111,7 +111,9 @@ function decode(rec){
   var SE = rec[i+6].charCodeAt()-28;
   var speed;
   var course;
-  speed = SP*10+DC/10;
+  //if(SP<=99 && SP>=80) SP -= 80;
+  speed = SP*10+parseInt(DC/10);
+  //Info["SP"] = SP*10;
   course = (DC%10)*100+SE;
   if(speed>=800)
     speed -= 800;
@@ -121,10 +123,11 @@ function decode(rec){
   Info["course"] = course;
 
   //to find where the status text ends
-  var i = 0;
+  //var i = 0;
   while(rec[i]!='}' && i<rec.length)
     i++;
-
+    if(i!=rec.length || rec[i]=='}')
+  {
   //to decode the status text
   var altitude;
   var alti3 = rec[i-1].charCodeAt()-33;
@@ -132,6 +135,7 @@ function decode(rec){
   var alti1 = rec[i-3].charCodeAt()-33;
   altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
   Info["altitude"] = altitude;
+  }
   return Info;
   //console.log(JSON.stringify(Info));
 }
