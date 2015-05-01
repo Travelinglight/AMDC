@@ -1,5 +1,10 @@
 function decode(rec){
+  var Info = {};
   var mic = rec.substr(rec.search(">") + 1, 6);
+  var Source = rec.substr(0, rec.search(">"));
+  Info.Source = Source;
+  Info.Destination = mic;
+
   if (mic.length != 6)
     return;
   var regexp = /^[0-9A-LP-Z]+$/;
@@ -51,12 +56,14 @@ function decode(rec){
   MicMsg[6] = {"S" : "M1: En Route", "C" : "C1: Custom-1"};
   MicMsg[7] = {"S" : "M0: Off Duty", "C" : "C0: Custom-0"};
 
-  var Info = {};
-  Info.LatiD = parseInt(map[mic[0]].LatDigit + map[mic[1]].LatDigit);
-  Info.LatiM = parseInt(map[mic[2]].LatDigit + map[mic[3]].LatDigit);
-  Info.LatiH = parseInt(map[mic[4]].LatDigit + map[mic[5]].LatDigit);
-  Info.NS = map[mic[3]].NS;
-  Info.WE = map[mic[5]].WE;
+  var LatiD = parseInt(map[mic[0]].LatDigit + map[mic[1]].LatDigit);
+  var LatiM = parseInt(map[mic[2]].LatDigit + map[mic[3]].LatDigit);
+  var LatiH = parseInt(map[mic[4]].LatDigit + map[mic[5]].LatDigit);
+  var Latitude = LatiD + LatiM/60 + LatiH/3600;
+  var NS = map[mic[3]].NS;
+  var WE = map[mic[5]].WE;
+  if(NS == "South")Latitude = -Latitude;
+  Info.Latitude = Latitude;
   Info.LongOff = map[mic[4]].LongOff;
 
   // mic-e message
@@ -72,13 +79,17 @@ function decode(rec){
   else
     msgTyp = "E";
 
+
   // assign message
+  var Message;
   if (msgTyp == "E")
-    Info.Msg = MicMsg[0];
+    Message = MicMsg[0];
   else if (msgTyp == "S")
-    Info.Msg = MicMsg[msgIdx].S;
+    Message = MicMsg[msgIdx].S;
   else if (msgTyp == "C")
-    Info.Msg = MicMsg[msgIdx].C;
+    Message = MicMsg[msgIdx].C;
+  var Comments = {};
+  Comments.MicMsg = Message;
 
   //to find where the Infomation field starts
   var i = 0;
@@ -93,17 +104,18 @@ function decode(rec){
     LongD -= 80;
   if(LongD>=190 && LongD<=199)
     LongD -= 190;
-  Info["LongD"] = LongD;
 
   //to decode the longitute minutes
   var LongM = rec[i+2].charCodeAt()-28;
   if(LongM>=60)
     LongM -= 60;
-  Info["LongM"] = LongM;
 
   //to decode the longitute hundredths
   var LongH = rec[i+3].charCodeAt()-28;
-  Info["LongH"] = LongH;
+
+  var Longitude = LongD + LongM/60 + LongH/3600;
+  if(WE == "West")Longitude = -Longitude;
+  Info.Longitude = Longitude;
 
   //to decode the speed and course
   var SP = rec[i+4].charCodeAt()-28;
@@ -119,8 +131,22 @@ function decode(rec){
     speed -= 800;
   if(course>=400)
     course -= 400;
-  Info["speed"] = speed;
-  Info["course"] = course;
+  Info.Speed = speed;
+  Info.Course = course;
+
+  //to decode the symbol
+  var flag = 0;
+  var SymbolID = rec[i+8];
+  var SymbolCode = rec[i+7];
+  var Symbol = SymbolID + SymbolCode;
+  if(rec[i+8] == '/' || rec[i+8] == '\\'){
+    if(SymbolCode.charCodeAt()>=33 && SymbolCode.charCodeAt()<=126){
+      flag = 1;
+    }
+  }
+
+  if(flag = 1){Comments.Type = Symbol};
+  Info.Comments = JSON.stringify(Comments);
 
   //to find where the status text ends
   //var i = 0;
@@ -134,7 +160,7 @@ function decode(rec){
   var alti2 = rec[i-2].charCodeAt()-33;
   var alti1 = rec[i-3].charCodeAt()-33;
   altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
-  Info["altitude"] = altitude;
+  Info.Altitude = altitude;
   }
   return Info;
   //console.log(JSON.stringify(Info));
