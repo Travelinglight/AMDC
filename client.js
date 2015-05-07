@@ -85,6 +85,9 @@ function filter(d_msg){
       req.write(postData);
       req.end();
     }
+    else {
+      file_write(d_msg, './delete_data.txt');
+    }
   }
   else{
     file_write(d_msg, './delete_data.txt');
