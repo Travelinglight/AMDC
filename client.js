@@ -1,11 +1,13 @@
 var net = require('net');
 var decoder = require('./decode.js');
 var http = require("http");
+var fs = require("fs");
 //var bodyParser = require("body-parser");
 
 var send=1;
 var login = "user bg5zzz pass 24229 "
 var postData = '';
+var myDate = new Date();
 
 var pullOptions = {
   host: 'rotate.aprs2.net',
@@ -35,10 +37,44 @@ client.on('data',function(data){
 })
 
 function filter(d_msg){
+  fs.open('./all_data.txt','a',function open(err,fd){
+    if(err){throw err;}
+    var writeBuffer=new Buffer('['+myDate.toUTCString()+']'+d_msg),
+        bufferPosition=0,
+        bufferLength=writeBuffer.length,
+        fileposition=null;
+    fs.write(fd,
+      writeBuffer,
+      bufferPosition,
+      bufferLength,
+      fileposition,
+      function wrote(err,written){
+        if(err) {throw err;}
+        console.log('wrote'+written+'byte');
+        fs.closeSync(fd);
+      });
+  });
   var i=0;
   while(d_msg[i]!=':' && i<d_msg.length)
     ++i;
   if((d_msg[i+1]=='`' || d_msg[i+1]=="'") && (d_msg.search(">") >= 0) && (send == 1)) {
+    fs.open('./filter_data.txt','a',function open(err,fd){
+      if(err){throw err;}
+      var writeBuffer=new Buffer('['+myDate.toUTCString()+']'+d_msg),
+      bufferPosition=0,
+      bufferLength=writeBuffer.length,
+      fileposition=null;
+      fs.write(fd,
+        writeBuffer,
+        bufferPosition,
+        bufferLength,
+        fileposition,
+        function wrote(err,written){
+          if(err) {throw err;}
+          console.log('wrote'+written+'byte');
+          fs.closeSync(fd);
+        });
+      });
     console.log(d_msg);
     var haha = decoder.decode(d_msg);
     postData = JSON.stringify(haha);
@@ -65,6 +101,27 @@ function filter(d_msg){
       req.end();
     }
   }
+  else{
+    fs.open('./delete_data.txt','a',function open(err,fd){
+      if(err){throw err;}
+      var writeBuffer=new Buffer('['+myDate.toUTCString()+']'+d_msg),
+      bufferPosition=0,
+      bufferLength=writeBuffer.length,
+      fileposition=null;
+      fs.write(fd,
+        writeBuffer,
+        bufferPosition,
+        bufferLength,
+        fileposition,
+        function wrote(err,written){
+          if(err) {throw err;}
+          console.log('wrote'+written+'byte');
+          fs.closeSync(fd);
+        });
+    });
+  }
+
+
 }
 
 client.on('end',function(){
