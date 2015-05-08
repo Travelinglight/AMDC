@@ -25,9 +25,14 @@ client.on('data',function(data){
   var rec = data.toString();
   var j=0;
   var buff = '';
+  var flag = 0;
   for (i = 0; i < rec.length; ++i) {
     buff += rec[i];
-    if (rec[i] == '\n') {
+    if (rec[i] == '\r') {
+      flag = 1;
+    }
+    if ((flag) && (rec[i] == '\n')) {
+      flag = 0;
       filter(buff);
       buff = '';
     }
