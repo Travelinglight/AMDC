@@ -8,7 +8,7 @@ var server = app.listen(2333, function() {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/haha", function(req, res) {
+app.post("/moving_object", function(req, res) {
   //var str = URLDecoder.decode(res.body,"utf-8");
   console.log(req.body);
   console.log("haha");

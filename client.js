@@ -69,7 +69,7 @@ function filter(d_msg){
       var postOptions = {
         hostname : 'localhost',
         port : 2333,
-        path : '/haha',
+        path : '/moving_object',
         method : 'POST',
         headers : {
           'Content-Type': 'application/json',
