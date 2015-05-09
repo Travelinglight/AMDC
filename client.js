@@ -100,5 +100,12 @@ function filter(d_msg){
 }
 
 client.on('end',function(){
-  console.log('Client unconnected.');
+  console.log('Client unconnected.----------------------------------------------------------------------------------------');
+  client = net.connect(pullOptions,function(){
+    console.log('Client connected.');
+    client.write(login);
+    client.write('# filter t/po\r\n');
+  }).on('error',function(error){
+    console.log('Error: '+error.message);
+  })
 })
