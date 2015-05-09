@@ -25,14 +25,9 @@ client.on('data',function(data){
   var rec = data.toString();
   var j=0;
   var buff = '';
-  var flag = 0;
   for (i = 0; i < rec.length; ++i) {
     buff += rec[i];
-    if (rec[i] == '\r') {
-      flag = 1;
-    }
-    if ((flag) && (rec[i] == '\n')) {
-      flag = 0;
+    if ((rec[i] == '\n') && (i > 0) && (rec[i - 1] == '\r')) {
       filter(buff);
       buff = '';
     }
@@ -61,12 +56,12 @@ function file_write(content, file) {
 }
 
 function filter(d_msg){
-  file_write(d_msg, './all_data.txt');
+  file_write(d_msg, './all_data.log');
   var i=0;
   while(d_msg[i]!=':' && i<d_msg.length)
     ++i;
   if((d_msg[i+1]=='`' || d_msg[i+1]=="'") && (d_msg.search(">") >= 0) && (send == 1)) {
-    file_write(d_msg, './filter_data.txt');
+    file_write(d_msg, './filter_data.log');
     console.log(d_msg);
     var haha = decoder.decode(d_msg);
     postData = JSON.stringify(haha);
@@ -91,21 +86,14 @@ function filter(d_msg){
       req.end();
     }
     else {
-      file_write(d_msg, './delete_data.txt');
+      file_write(d_msg, './delete_data.log');
     }
   }
   else{
-    file_write(d_msg, './delete_data.txt');
+    file_write(d_msg, './delete_data.log');
   }
 }
 
 client.on('end',function(){
-  console.log('Client unconnected.----------------------------------------------------------------------------------------');
-  client = net.connect(pullOptions,function(){
-    console.log('Client connected.');
-    client.write(login);
-    client.write('# filter t/po\r\n');
-  }).on('error',function(error){
-    console.log('Error: '+error.message);
-  })
+  console.log('Client unconnected.');
 })
