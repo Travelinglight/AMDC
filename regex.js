@@ -1,7 +1,7 @@
 var fs = require('fs');
-var regexp = /[A-Z0-6]{6}.*:['`]/;
+var regexp = /[A-Z0-6]{6}.*:[`'][\x26-\x7f][\x26-\x61][\x1c-\x7f][\x1c-\x7f][\x1c-\x7d][\x1c-\x7f]/;
 
-fs.readFile('./delete_data.txt',function(err,data){
+fs.readFile('./delete_data.log',function(err,data){
   if(err)
     throw err;
   var i=0;
