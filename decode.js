@@ -1,5 +1,6 @@
 function decode(rec, myDate){
   var Info = {};
+  var i = rec.search(">") + 7;
   var mic = rec.substr(rec.search(">") + 1, 6);
   var Source = rec.substr(0, rec.search(">"));
   Info.Source = Source;
@@ -91,12 +92,11 @@ function decode(rec, myDate){
   Comments.MicMsg = Message;
 
   //to find where the Infomation field starts
-  var i = 0;
-  while((rec[i]!='`') && (rec[i] != '\'') && (i<rec.length))
+  while((i<rec.length) && ((rec[i - 1] != ':') || ((rec[i]!='`') && (rec[i] != '\''))))
     i++;
 
   //to decode the longitute degrees
-  var LongD = rec[i+1].charCodeAt()-28;
+  var LongD = rec[++i].charCodeAt()-28;
   if(Info.LongOff == 100)
     LongD += 100;
   if(LongD>=180 && LongD<=189)
@@ -105,42 +105,46 @@ function decode(rec, myDate){
     LongD -= 190;
 
   //to decode the longitute minutes
-  var LongM = rec[i+2].charCodeAt()-28;
+  var LongM = rec[++i].charCodeAt()-28;
   if(LongM>=60)
     LongM -= 60;
 
   //to decode the longitute hundredths
-  var LongH = rec[i+3].charCodeAt()-28;
+  var LongH = rec[++i].charCodeAt()-28;
 
   var Longitude = LongD + LongM/60 + LongH/3600;
   if(WE == "West")Longitude = -Longitude;
   Info.Longitude = Longitude;
 
   //to decode the speed and course
-  var SP = rec[i+4].charCodeAt()-28;
-  var DC = rec[i+5].charCodeAt()-28;
-  var SE = rec[i+6].charCodeAt()-28;
-  var speed;
-  var course;
-  //if(SP<=99 && SP>=80) SP -= 80;
-  speed = SP*10+parseInt(DC/10);
-  //Info["SP"] = SP*10;
-  course = (DC%10)*100+SE;
-  if(speed>=800)
-    speed -= 800;
-  if(course>=400)
-    course -= 400;
-  Info.Speed = speed;
-  Info.Course = course;
+  if (i + 3 < rec.length) {
+    var SP = rec[++i].charCodeAt()-28;
+    var DC = rec[++i].charCodeAt()-28;
+    var SE = rec[++i].charCodeAt()-28;
+    var speed;
+    var course;
+    //if(SP<=99 && SP>=80) SP -= 80;
+    speed = SP*10+parseInt(DC/10);
+    //Info["SP"] = SP*10;
+    course = (DC%10)*100+SE;
+    if(speed>=800)
+      speed -= 800;
+    if(course>=400)
+      course -= 400;
+    Info.Speed = speed;
+    Info.Course = course;
+  }
 
   //to decode the symbol
   var flag = 0;
-  var SymbolID = rec[i+8];
-  var SymbolCode = rec[i+7];
-  var Symbol = SymbolID + SymbolCode;
-  if(rec[i+8] == '/' || rec[i+8] == '\\'){
-    if(SymbolCode.charCodeAt()>=33 && SymbolCode.charCodeAt()<=126){
-      flag = 1;
+  if (i + 2 < rec.length) {
+    var SymbolID = rec[i + 2];
+    var SymbolCode = rec[i + 1];
+    var Symbol = SymbolID + SymbolCode;
+    if(rec[i + 2] == '/' || rec[i + 2] == '\\'){
+      if(SymbolCode.charCodeAt()>=33 && SymbolCode.charCodeAt()<=126){
+        flag = 1;
+      }
     }
   }
 
@@ -149,9 +153,10 @@ function decode(rec, myDate){
 
   //to find where the status text ends
   //var i = 0;
-  while(rec[i]!='}' && i<rec.length)
+  i += 3;
+  while(i<rec.length && rec[i]!='}')
     i++;
-  if(i!=rec.length || rec[i]=='}') {
+  if(i < rec.length || rec[i]=='}') {
       //to decode the status text
       var altitude;
       var alti3 = rec[i-1].charCodeAt()-33;
@@ -160,7 +165,7 @@ function decode(rec, myDate){
       altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
       Info.Altitude = altitude;
   }
-  Info.Time = myDate;
+  Info.Time = myDate.toUTCString();
   return Info;
   //console.log(JSON.stringify(Info));
 }
