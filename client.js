@@ -25,19 +25,19 @@ client.on('data',function(data){
   var rec = data.toString();
   var j=0;
   var buff = '';
+  var myDate = new Date();
   for (i = 0; i < rec.length; ++i) {
     buff += rec[i];
     if ((rec[i] == '\n') && (i > 0) && (rec[i - 1] == '\r')) {
-      filter(buff);
+      filter(buff, myDate);
       buff = '';
     }
   }
 })
 
-function file_write(content, file) {
+function file_write(content, file, myDate) {
   fs.open(file,'a',function open(err,fd){
     if(err){throw err;}
-    var myDate = new Date();
     var writeBuffer=new Buffer('['+myDate.toUTCString()+']'+content);
     var bufferPosition=0;
     var bufferLength=writeBuffer.length;
@@ -55,15 +55,15 @@ function file_write(content, file) {
   });
 }
 
-function filter(d_msg){
-  file_write(d_msg, './all_data.log');
+function filter(d_msg, myDate){
+  file_write(d_msg, './all_data.log', myDate);
   var i=0;
   while(d_msg[i]!=':' && i<d_msg.length)
     ++i;
   if((d_msg[i+1]=='`' || d_msg[i+1]=="'") && (d_msg.search(">") >= 0) && (send == 1)) {
-    file_write(d_msg, './filter_data.log');
+    file_write(d_msg, './filter_data.log', myDate);
     console.log(d_msg);
-    var haha = decoder.decode(d_msg);
+    var haha = decoder.decode(d_msg, myDate);
     postData = JSON.stringify(haha);
     if (postData != undefined) {
       var postOptions = {
@@ -86,11 +86,11 @@ function filter(d_msg){
       req.end();
     }
     else {
-      file_write(d_msg, './delete_data.log');
+      file_write(d_msg, './delete_data.log', myDate);
     }
   }
   else{
-    file_write(d_msg, './delete_data.log');
+    file_write(d_msg, './delete_data.log', myDate);
   }
 }
 

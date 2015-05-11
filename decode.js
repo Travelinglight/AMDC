@@ -1,4 +1,4 @@
-function decode(rec){
+function decode(rec, myDate){
   var Info = {};
   var mic = rec.substr(rec.search(">") + 1, 6);
   var Source = rec.substr(0, rec.search(">"));
@@ -79,7 +79,6 @@ function decode(rec){
   else
     msgTyp = "E";
 
-
   // assign message
   var Message;
   if (msgTyp == "E")
@@ -152,16 +151,16 @@ function decode(rec){
   //var i = 0;
   while(rec[i]!='}' && i<rec.length)
     i++;
-    if(i!=rec.length || rec[i]=='}')
-  {
-  //to decode the status text
-  var altitude;
-  var alti3 = rec[i-1].charCodeAt()-33;
-  var alti2 = rec[i-2].charCodeAt()-33;
-  var alti1 = rec[i-3].charCodeAt()-33;
-  altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
-  Info.Altitude = altitude;
+  if(i!=rec.length || rec[i]=='}') {
+      //to decode the status text
+      var altitude;
+      var alti3 = rec[i-1].charCodeAt()-33;
+      var alti2 = rec[i-2].charCodeAt()-33;
+      var alti1 = rec[i-3].charCodeAt()-33;
+      altitude = alti3 + alti2*91 + alti1*91*91 - 10000;
+      Info.Altitude = altitude;
   }
+  Info.Time = myDate;
   return Info;
   //console.log(JSON.stringify(Info));
 }
