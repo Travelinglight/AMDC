@@ -3,7 +3,6 @@ var decoder = require('./decode.js');
 var http = require("http");
 var fs = require("fs");
 
-var send=1;
 var login = "user bg5zzz pass 24229 "
 var postData = '';
 
@@ -96,4 +95,11 @@ function filter(d_msg, myDate){
 
 client.on('end',function(){
   console.log('Client unconnected.');
+  client = net.connect(pullOptions,function(){
+    console.log('Client connected.');
+    client.write(login);
+    client.write('# filter t/po\r\n');
+  }).on('error',function(error){
+    console.log('Error: '+error.message);
+  })
 })
