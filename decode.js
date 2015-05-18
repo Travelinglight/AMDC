@@ -1,10 +1,36 @@
 function decode(rec, myDate){
   var Info = {};
+  var Path = new Array();
   var i = rec.search(">") + 7;
   var mic = rec.substr(rec.search(">") + 1, 6);
   var Source = rec.substr(0, rec.search(">"));
   Info.Source = Source;
   Info.Destination = mic;
+
+  var regexp1= /(WIDE.*|[Qq]AC|[Qq]AX|[Qq]AU|[Qq]Ao|[Qq]AO|[Qq]AS|[Qq]Ar|[Qq]AR|[Qq]AZ|[Qq]AI|TCPIP.*|TRACE.*|RELAY.*)/
+  var j=rec.search(",");
+  var End=rec.search(":");
+  var comma;
+  while(j<End){
+    comma=rec.indexOf(",",j+1);
+    if(comma==-1 || comma>End){
+      comma=rec.search(":");
+    }
+    var digi=rec.substr(j+1,comma-j-1);
+    console.log(digi);
+    if(!regexp1.test(digi)){
+      var astic=digi.indexOf("*",0);
+      if(astic==-1)   Path.push(digi);
+      else{
+        digi=digi.substr(0,astic);
+        Path.push(digi);
+      }
+      console.log(Path);
+    }
+    else j=comma;
+    j=comma;
+  }
+  Info.Path = Path;
 
   if (mic.length != 6)
     return;
