@@ -59,7 +59,7 @@ function filter(d_msg, myDate){
   var i=0;
   while(d_msg[i]!=':' && i<d_msg.length)
     ++i;
-  if((d_msg[i+1]=='`' || d_msg[i+1]=="'") && (d_msg.search(">") >= 0) && (send == 1)) {
+  if((d_msg[i+1]=='`' || d_msg[i+1]=="'") && (d_msg.search(">") >= 0) /*&& (send == 1)*/) {
     file_write(d_msg, './filter_data.log', myDate);
     console.log(d_msg);
     var haha = decoder.decode(d_msg, myDate);
