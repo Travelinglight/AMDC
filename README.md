@@ -14,25 +14,25 @@ AMDC (APRS MobileObject Data Client) is a client used to receive info of mobile 
 7. A MIC-E message (optional);
 
 ### How to test?
-1. Clone the repo and enter it.
+1. Clone the repo and navigate to the folder.
 ```
 git clone git@github.com:Travelinglight/AMDC.git
 cd AMDC
 ```
-2. Install express and body-parser modules with NPM
+2. Install express and body-parser modules with NPM.
 ```
 npm install express
 npm install body-parser
 ```
-3. Run the Server
+3. Run the Server.
 ```
 node Server.js
 ```
-4. Open another bash and run the client
+4. Open another terminal and run the client.
 ```
 node client.js
 ```
-5. See the result in the Server bash
+5. See the result in the Server terminal
 
 ![alt text](result.png)
 
