@@ -4,14 +4,14 @@ AMDC (APRS MobileObject Data Client) is a client used to receive info of mobile 
 ### dependencies: Node.js
 
 ### What information can you get?
-0. The source from which the message is sent;
+0. The source of a message;
 1. The West/East, degree, minute and hundredths of minutes of Latitude;
 2. The North/South, degree, minute and hundredths of minutes of Longitude;
-3. The speed of the moving object;
-4. The course of the moving object;
-5. The altitude of the moving object (optional);
-6. The type of the moving object (optional);
-7. A MIC-E message (optional);
+3. The speed of a moving object;
+4. The course of a moving object;
+5. The altitude of a moving object (optional);
+6. The type of a moving object (optional);
+7. A MIC-E message (optional).
 
 ### How to test?
 1. Clone the repo and enter it.
@@ -48,7 +48,7 @@ app.post("/moving_object", function(req, res) {
 });
 ```
 
-### Information Explaination
+### Information Explanation
 0. The source (CALL) can be obtained from req.body.Source. It is the ID of the object;
 1. Longitude can be obtained from req.body.Longitude. A positive number means East and a negative one means West;
 2. Latitude can be obtained from req.body.Latitude. A positive number means North and a negative one means South;
